@@ -11,6 +11,9 @@ import TenantRepository from '../../database/repositories/tenantRepository';
 import { tenantSubdomain } from '../tenantSubdomain';
 import Error401 from '../../errors/Error401';
 import moment from 'moment';
+import fs from 'fs';
+import path from 'path';
+
 
 const BCRYPT_SALT_ROUNDS = 12;
 
@@ -19,7 +22,8 @@ class AuthService {
     email,
     password,
     invitationToken,
-    tenantId, 
+    tenantId,
+    userType, 
     options: any = {},
   ) {
     const session = await MongooseRepository.createSession(
@@ -33,6 +37,8 @@ class AuthService {
         email,
         options,
       );
+
+      console.log('existingUser',existingUser)
 
       // Generates a hashed password to hide the original one.
       const hashedPassword = await bcrypt.hash(
@@ -79,6 +85,7 @@ class AuthService {
           existingUser,
           invitationToken,
           tenantId,
+          userType,
           {
             ...options,
             session,
@@ -98,6 +105,8 @@ class AuthService {
             },
           ),
         );
+
+        console.log('isEmailVerified',isEmailVerified)
 
         if (!isEmailVerified && EmailSender.isConfigured) {
           await this.sendEmailAddressVerificationEmail(
@@ -142,6 +151,7 @@ class AuthService {
         newUser,
         invitationToken,
         tenantId,
+        userType,
         {
           ...options,
           session,
@@ -174,15 +184,10 @@ class AuthService {
         );
       }
 
-      const token = jwt.sign(
-        { id: newUser.id },
-        getConfig().AUTH_JWT_SECRET,
-        { expiresIn: getConfig().AUTH_JWT_EXPIRES_IN },
-      );
 
       await MongooseRepository.commitTransaction(session);
 
-      return token;
+      return true
     } catch (error) {
       await MongooseRepository.abortTransaction(session);
 
@@ -200,6 +205,7 @@ class AuthService {
     password,
     invitationToken,
     tenantId,
+    userType,
     options: any = {},
   ) {
     const session = await MongooseRepository.createSession(
@@ -242,6 +248,15 @@ class AuthService {
         );
       }
 
+      let verify = user.emailVerified
+
+      if(!verify){
+        throw new Error400(
+          options.language,
+          'auth.notVerified',
+        );
+      }
+
       // Handles onboarding process like
       // invitation, creation of default tenant,
       // or default joining the current tenant
@@ -249,6 +264,7 @@ class AuthService {
         user,
         invitationToken,
         tenantId,
+        userType,
         {
           ...options,
           currentUser: user,
@@ -276,6 +292,7 @@ class AuthService {
     currentUser,
     invitationToken,
     tenantId,
+    userType,
     options,
   ) {
     if (invitationToken) {
@@ -332,8 +349,7 @@ class AuthService {
         currentUser,
       }).createOrJoinDefault(
         {
-          // leave empty to require admin's approval
-          roles: [],
+          roles: [userType ==="host"?"host":"user"],
         },
         options.session,
       );
@@ -359,7 +375,7 @@ class AuthService {
             bypassPermissionValidation: true,
           })
             .then((user) => {
-              const isTokenManuallyExpired =
+              const isTokenManuallyExpired = 
                 user &&
                 user.jwtTokenInvalidBefore &&
                 moment
@@ -388,92 +404,115 @@ class AuthService {
   }
 
   static async sendEmailAddressVerificationEmail(
-    language,
-    email,
-    tenantId,
-    options,
-  ) {
-    if (!EmailSender.isConfigured) {
-      throw new Error400(language, 'email.error');
-    }
-
-    let link;
-    try {
-      let tenant;
-
-      if (tenantId) {
-        tenant = await TenantRepository.findById(tenantId, {
-          ...options,
-        });
-      }
-
-      email = email.toLowerCase();
-      const token =
-        await UserRepository.generateEmailVerificationToken(
-          email,
-          options,
-        );
-      link = `${tenantSubdomain.frontendUrl(
-        tenant,
-      )}/auth/verify-email?token=${token}`;
-    } catch (error) {
-      console.error(error);
-      throw new Error400(
-        language,
-        'auth.emailAddressVerificationEmail.error',
-      );
-    }
-
-    return new EmailSender(
-      EmailSender.TEMPLATES.EMAIL_ADDRESS_VERIFICATION,
-      { link },
-    ).sendTo(email);
+  language,
+  email,
+  tenantId,
+  options,
+) {
+  
+  if (!EmailSender.isConfigured) {
+    throw new Error400(language, 'email.error');
   }
 
-  static async sendPasswordResetEmail(
-    language,
-    email,
-    tenantId,
-    options,
-  ) {
-    if (!EmailSender.isConfigured) {
-      throw new Error400(language, 'email.error');
+  let link;
+  try {
+    let tenant;
+
+    if (tenantId) {
+      tenant = await TenantRepository.findById(tenantId, {
+        ...options,
+      });
     }
 
-    let link;
-
-    try {
-      let tenant;
-
-      if (tenantId) {
-        tenant = await TenantRepository.findById(tenantId, {
-          ...options,
-        });
-      }
-
-      email = email.toLowerCase();
-      const token =
-        await UserRepository.generatePasswordResetToken(
-          email,
-          options,
-        );
-
-      link = `${tenantSubdomain.frontendUrl(
-        tenant,
-      )}/auth/password-reset?token=${token}`;
-    } catch (error) {
-      console.error(error);
-      throw new Error400(
-        language,
-        'auth.passwordReset.error',
+    email = email.toLowerCase();
+    const token =
+      await UserRepository.generateEmailVerificationToken(
+        email,
+        options,
       );
+
+    link = `${tenantSubdomain.frontendUrl(
+      tenant,
+    )}/auth/verify-email?token=${token}`;
+  } catch (error) {
+    console.error(error);
+    throw new Error400(
+      language,
+      'auth.emailAddressVerificationEmail.error',
+    );
+  }
+
+  // new subject line
+  const subject = 'Verify your email address';
+
+  const templatePath = path.join(
+    __dirname,
+    '../../../email-templates/emailAddressVerification.html'
+  );
+
+  let html = fs.readFileSync(templatePath, 'utf8');
+
+  // replace a placeholder in your template with the link
+  html = html.replace('{{RESET_LINK}}', link);
+
+  return new EmailSender(subject, html).sendTo(email);
+}
+
+
+static async sendPasswordResetEmail(
+  language,
+  email,
+  tenantId,
+  options,
+) {
+  if (!EmailSender.isConfigured) {
+    throw new Error400(language, 'email.error');
+  }
+
+  let link;
+
+  try {
+    let tenant;
+
+    if (tenantId) {
+      tenant = await TenantRepository.findById(tenantId, {
+        ...options,
+      });
     }
 
-    return new EmailSender(
-      EmailSender.TEMPLATES.PASSWORD_RESET,
-      { link },
-    ).sendTo(email);
+    email = email.toLowerCase();
+    const token =
+      await UserRepository.generatePasswordResetToken(
+        email,
+        options,
+      );
+
+    link = `${tenantSubdomain.frontendUrl(
+      tenant,
+    )}/auth/password-reset?token=${token}`;
+  } catch (error) {
+    console.error(error);
+    throw new Error400(
+      language,
+      'auth.passwordReset.error',
+    );
   }
+
+  // new subject
+  const subject = 'Reset your password';
+
+ const templatePath = path.join(
+    __dirname,
+    '../../../email-templates/passwordReset.html'
+  );
+
+  let html = fs.readFileSync(templatePath, 'utf8');
+
+  // replace a placeholder in your template with the link
+  html = html.replace('{{RESET_LINK}}', link);
+
+  return new EmailSender(subject, html).sendTo(email);
+}
 
   static async verifyEmail(token, options) {
     const currentUser = options.currentUser;

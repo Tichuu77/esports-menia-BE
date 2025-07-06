@@ -38,8 +38,8 @@ export default (app) => {
   );
 
   const signUpRateLimiter = createRateLimiter({
-    max: 20,
-    windowMs: 60 * 60 * 1000,
+    max: 3,
+    windowMs: 3 * 24 * 60 * 60 * 1000, // 3 days
     message: 'errors.429',
   });
 

@@ -1,68 +1,61 @@
 import assert from 'assert';
 import { getConfig } from '../config';
-import sendgridMail from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
 
-if (getConfig().SENDGRID_KEY) {
-  sendgridMail.setApiKey(getConfig().SENDGRID_KEY);
+// create reusable transporter
+let transporter: nodemailer.Transporter | null = null;
+
+if (
+  getConfig().SMTP_USER &&
+  getConfig().SMTP_PASSWORD
+) {
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: getConfig().SMTP_USER,
+      pass: getConfig().SMTP_PASSWORD,
+    },
+  });
 }
 
 export default class EmailSender {
-  templateId: string;
-  variables: any;
+  subject: string;
+  html: string;
 
-  constructor(templateId, variables) {
-    this.templateId = templateId;
-    this.variables = variables;
+  constructor(subject: string, html: string) {
+    this.subject = subject;
+    this.html = html;
   }
 
-  static get TEMPLATES() {
-    if (!EmailSender.isConfigured) {
-      return {};
-    }
-
-    return {
-      EMAIL_ADDRESS_VERIFICATION:
-        getConfig()
-          .SENDGRID_TEMPLATE_EMAIL_ADDRESS_VERIFICATION,
-      INVITATION: getConfig().SENDGRID_TEMPLATE_INVITATION,
-      PASSWORD_RESET:
-        getConfig().SENDGRID_TEMPLATE_PASSWORD_RESET,
-    };
+  static get isConfigured() {
+    return Boolean(transporter);
   }
 
-  async sendTo(recipient) {
+  async sendTo(recipient: string) {
     if (!EmailSender.isConfigured) {
       console.error(`Email provider is not configured.`);
       return;
     }
 
-    assert(recipient, 'to is required');
-    assert(
-      getConfig().SENDGRID_EMAIL_FROM,
-      'SENDGRID_EMAIL_FROM is required',
-    );
-    assert(this.templateId, 'templateId is required');
+    assert(recipient, 'Recipient is required');
+    assert(this.subject, 'Subject is required');
+    assert(this.html, 'HTML is required');
 
-    const msg = {
+    const mailOptions = {
+      from: getConfig().SMTP_FROM,
       to: recipient,
-      from: getConfig().SENDGRID_EMAIL_FROM,
-      templateId: this.templateId,
-      dynamicTemplateData: this.variables,
+      subject: this.subject,
+      html: this.html,
     };
 
     try {
-      return await sendgridMail.send(msg);
+      const info = await transporter!.sendMail(mailOptions);
+      console.log(`Email sent: ${info.messageId}`);
+      return info;
     } catch (error) {
-      console.error('Error sending SendGrid email.');
+      console.error('Error sending email with Nodemailer.');
       console.error(error);
       throw error;
     }
-  }
-
-  static get isConfigured() {
-    return Boolean(
-      getConfig().SENDGRID_EMAIL_FROM &&
-        getConfig().SENDGRID_KEY,
-    );
   }
 }

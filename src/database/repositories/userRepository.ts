@@ -700,6 +700,7 @@ export default class UserRepository {
   }
 
   static async count(filter, options: IRepositoryOptions) {
+    console.log('run')
     return MongooseRepository.wrapWithSessionIfExists(
       User(options.database).countDocuments(filter),
       options,

@@ -27,6 +27,7 @@ const en = {
     passwordChange: {
       invalidPassword: 'The old password is invalid',
     },
+    notVerified:'you email not verified',
   },
 
   user: {
