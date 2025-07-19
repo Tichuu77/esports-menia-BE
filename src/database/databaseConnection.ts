@@ -15,10 +15,8 @@ export async function databaseInit() {
    * Connects to MongoDB
    */
   return mongoose
-    .connect(getConfig().DATABASE_CONNECTION, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
+    .connect(getConfig().DATABASE_CONNECTION,{
+      dbName: 'esport-menia',
     })
     .then(() => {
       init(mongoose);

@@ -23,6 +23,9 @@ export default class AuthProfileEditor {
         this.options.database,
       );
 
+      console.log('Executing profile update for user:', this.options.currentUser.id);
+      console.log('Profile data:', this.data);
+
       await UserRepository.updateProfile(
         this.options.currentUser.id,
         this.data,

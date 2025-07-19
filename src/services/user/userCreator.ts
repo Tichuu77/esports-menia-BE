@@ -5,6 +5,9 @@ import MongooseRepository from '../../database/repositories/mongooseRepository';
 import TenantUserRepository from '../../database/repositories/tenantUserRepository';
 import { tenantSubdomain } from '../tenantSubdomain';
 import { IServiceOptions } from '../IServiceOptions';
+import Error400 from '../../errors/Error400';
+import path from 'path';
+import fs from 'fs';
 
 export default class UserCreator {
   options: IServiceOptions;
@@ -89,7 +92,7 @@ export default class UserCreator {
    * Creates or updates the user passed.
    * If the user already exists, it only adds the role to the user.
    */
-  async _addOrUpdate(email) {
+  async _addOrUpdate(email,language = this.options.language) {
     let user =
       await UserRepository.findByEmailWithoutAvatar(email, {
         ...this.options,
@@ -138,10 +141,10 @@ export default class UserCreator {
     );
   }
 
-  async _sendAllInvitationEmails() {
-    if (!this.sendInvitationEmails) {
-      return;
-    }
+  async _sendAllInvitationEmails( language = this.options.language) {
+    if (!EmailSender.isConfigured) {
+          throw new Error400(language, 'email.error');
+        }
 
     return Promise.all(
       this.emailsToInvite.map((emailToInvite) => {
@@ -149,13 +152,21 @@ export default class UserCreator {
           this.options.currentTenant,
         )}/auth/invitation?token=${emailToInvite.token}`;
 
-        return new EmailSender(
-          EmailSender.TEMPLATES.INVITATION,
-          {
-            tenant: this.options.currentTenant,
-            link,
-          },
-        ).sendTo(emailToInvite.email);
+        console.log(`Sending invitation email to ${emailToInvite.email} with link: ${link}`);
+
+          const subject = 'Invitation to join Esports Menia';
+       
+           const templatePath = path.join(
+             __dirname,
+             '../../../email-templates/invitation.html',
+           );
+       
+           let html = fs.readFileSync(templatePath, 'utf8');
+       
+           // replace a placeholder in your template with the link
+           html = html.replace('{{RESET_LINK}}', link);
+       
+           return new EmailSender(subject, html).sendTo(emailToInvite.email);
       }),
     );
   }

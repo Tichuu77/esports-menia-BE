@@ -28,6 +28,8 @@ app.use(languageMiddleware);
 // to set the currentUser to the requests
 app.use(authMiddleware);
 
+console.log('Auth middleware configured');
+
 // Setup the Documentation
 setupSwaggerUI(app);
 

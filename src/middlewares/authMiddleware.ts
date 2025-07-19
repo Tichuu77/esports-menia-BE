@@ -8,6 +8,7 @@ import Error401 from '../errors/Error401';
  * If userAutoAuthenticatedEmailForTests exists and no token is passed, it fills with this user for tests.
  */
 export async function authMiddleware(req, res, next) {
+   console.log('running authMiddleware');
   const isTokenEmpty =
     (!req.headers.authorization ||
       !req.headers.authorization.startsWith('Bearer ')) &&
@@ -32,12 +33,16 @@ export async function authMiddleware(req, res, next) {
     return next();
   }
 
+  if (!idToken || idToken === 'null' || idToken === 'undefined' || idToken.split('.').length !== 3) {
+  return next();
+}
+
   try {
     const currentUser: any = await AuthService.findByToken(
       idToken,
       req,
     );
-
+  
     req.currentUser = currentUser;
 
     return next();
