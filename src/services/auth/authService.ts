@@ -187,7 +187,13 @@ class AuthService {
 
       await MongooseRepository.commitTransaction(session);
 
-      return true
+      const token = jwt.sign(
+        { id: newUser.id },
+        getConfig().AUTH_JWT_SECRET,
+        { expiresIn: getConfig().AUTH_JWT_EXPIRES_IN },
+      );
+
+      return   token;
     } catch (error) {
       await MongooseRepository.abortTransaction(session);
 
@@ -228,6 +234,7 @@ class AuthService {
 
       const currentPassword =
         await UserRepository.findPassword(user.id, options);
+        console.log('currentPassword', currentPassword)
 
       if (!currentPassword) {
         throw new Error400(
@@ -248,14 +255,7 @@ class AuthService {
         );
       }
 
-      let verify = user.emailVerified
-
-      if (!verify) {
-        throw new Error400(
-          options.language,
-          'auth.notVerified',
-        );
-      }
+      
 
       // Handles onboarding process like
       // invitation, creation of default tenant,
@@ -494,6 +494,7 @@ class AuthService {
       link = `${tenantSubdomain.frontendUrl(
         tenant,
       )}/auth/password-reset?token=${token}`;
+      console.log('link', link)
     } catch (error) {
       console.error(error);
       throw new Error400(
@@ -514,6 +515,8 @@ class AuthService {
 
     // replace a placeholder in your template with the link
     html = html.replace('{{RESET_LINK}}', link);
+
+    console.log('html', html)
 
     return new EmailSender(subject, html).sendTo(email);
   }

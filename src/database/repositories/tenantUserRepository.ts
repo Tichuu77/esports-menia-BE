@@ -4,6 +4,7 @@ import User from '../models/user';
 import Roles from '../../security/roles';
 import crypto from 'crypto';
 import { IRepositoryOptions } from './IRepositoryOptions';
+import Error403 from '../../errors/Error403';
 
 export default class TenantUserRepository {
   static async findByInvitationToken(
@@ -199,6 +200,7 @@ export default class TenantUserRepository {
     invitationToken,
     options: IRepositoryOptions,
   ) {
+    console.log('acceptInvitation', invitationToken);
     const currentUser =
       MongooseRepository.getCurrentUser(options);
 
@@ -208,6 +210,12 @@ export default class TenantUserRepository {
         invitationToken,
         options,
       );
+
+      let emailMatch = invitationTenantUser.user.email === currentUser.email;
+
+    if (!invitationTenantUser || !emailMatch) {
+      return null;
+    }
 
     let existingTenantUser = currentUser.tenants.find(
       (userTenant) =>

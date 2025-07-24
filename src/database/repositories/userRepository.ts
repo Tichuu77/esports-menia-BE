@@ -874,4 +874,16 @@ export default class UserRepository {
       'email',
     ]);
   }
+
+  static async destroy(
+    id,
+    options: IRepositoryOptions,
+  ) {
+    const user = await this.findById(id, options);
+    if (!user) {
+      throw new Error404(options.language, 'userNotFound');
+    }
+    await User(options.database).deleteOne({ _id: id }, options);
+    return user;
+    }
 }
