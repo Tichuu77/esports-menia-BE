@@ -75,6 +75,13 @@ export default class UserEditor {
       this.data.roles,
       this.options,
     );
+
+    await TenantUserRepository.updateStatus(
+      this.options.currentTenant.id,
+      this.data.id,
+      this.data.status,
+      this.options,
+    );
   }
 
   /**

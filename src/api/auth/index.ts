@@ -37,15 +37,15 @@ export default (app) => {
     require('./authSignIn').default,
   );
 
-  const signUpRateLimiter = createRateLimiter({
-    max: 3,
-    windowMs: 3 * 24 * 60 * 60 * 1000, // 3 days
-    message: 'errors.429',
-  });
+  // const signUpRateLimiter = createRateLimiter({
+  //   max: 3,
+  //   windowMs: 3 * 24 * 60 * 60 * 1000, // 3 days
+  //   message: 'errors.429',
+  // });
 
   app.post(
     `/auth/sign-up`,
-    signUpRateLimiter,
+    // signUpRateLimiter,
     require('./authSignUp').default,
   );
 

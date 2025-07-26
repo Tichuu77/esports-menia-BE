@@ -10,7 +10,7 @@ import TenantService from '../tenantService';
 import TenantRepository from '../../database/repositories/tenantRepository';
 import { tenantSubdomain } from '../tenantSubdomain';
 import Error401 from '../../errors/Error401';
-import moment from 'moment';
+import moment, { invalid } from 'moment';
 import fs from 'fs';
 import path from 'path';
 
@@ -29,6 +29,14 @@ class AuthService {
     const session = await MongooseRepository.createSession(
       options.database,
     );
+ 
+    let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error400(
+        options.language,
+        'auth.invalidEmail',
+      );
+    }
 
     try {
       email = email.toLowerCase();
@@ -38,7 +46,6 @@ class AuthService {
         options,
       );
 
-      console.log('existingUser', existingUser)
 
       // Generates a hashed password to hide the original one.
       const hashedPassword = await bcrypt.hash(
@@ -240,6 +247,13 @@ class AuthService {
         throw new Error400(
           options.language,
           'auth.wrongPassword',
+        );
+      }
+
+      if(user.status === 'blocked') {
+        throw new Error400(
+          options.language,
+          'auth.userBlocked',
         );
       }
 

@@ -5,27 +5,6 @@ import User from '../models/user';
 import Tenant from '../models/tenant';
 import Settings from '../models/settings';
 import Error404 from '../../errors/Error404';
-import Company from '../models/company';
-import Year from '../models/year';
-import BalanceSheet from '../models/balanceSheet';
-import Group from '../models/group';
-import SubGroup from '../models/subGroup';
-import OpeningYear from '../models/openingYear';
-import ExpenseAccount from '../models/expenseAccount';
-import Item from '../models/item';
-import ItemQuality from '../models/itemQuality';
-import Size from '../models/size';
-import Packing from '../models/packing';
-import IndividualExpense from '../models/individualExpense';
-import ExpensesForBill from '../models/expensesForBill';
-import ExpensesForTransaction from '../models/expensesForTransaction';
-import GoodsType from '../models/goodsType';
-import GoodsArrival from '../models/goodsArrival';
-import GoodsSales from '../models/goodsSales';
-import SubPartyGoodsArrival from '../models/subPartyGoodsArrival';
-import MasterSelection from '../models/masterSelection';
-import VoucherEntry from '../models/voucherEntry';
-import ColdStorage from '../models/coldStorage';
 import Error400 from '../../errors/Error400';
 import { v4 as uuid } from 'uuid';
 import { isUserInTenant } from '../utils/userTenantUtils';
@@ -244,89 +223,6 @@ class TenantRepository {
       options,
     );
 
-    await Company(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await Year(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await BalanceSheet(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await Group(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await SubGroup(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await OpeningYear(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await ExpenseAccount(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await Item(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await ItemQuality(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await Size(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await Packing(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await IndividualExpense(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await ExpensesForBill(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await ExpensesForTransaction(
-      options.database,
-    ).deleteMany({ tenant: id }, options);
-    await GoodsType(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await GoodsArrival(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await GoodsSales(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await SubPartyGoodsArrival(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await MasterSelection(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await VoucherEntry(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
-    await ColdStorage(options.database).deleteMany(
-      { tenant: id },
-      options,
-    );
     await Settings(options.database).deleteMany(
       { tenant: id },
       options,

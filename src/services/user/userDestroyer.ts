@@ -115,12 +115,12 @@ export default class UserDestroyer {
       'ids is required',
     );
 
-    if (await this._isRemovingPlanUser()) {
-      throw new Error400(
-        this.options.language,
-        'user.errors.destroyingPlanUser',
-      );
-    }
+    // if (await this._isRemovingPlanUser()) {
+    //   throw new Error400(
+    //     this.options.language,
+    //     'user.errors.destroyingPlanUser',
+    //   );
+    // }
 
     if (this._isRemovingHimself()) {
       throw new Error400(

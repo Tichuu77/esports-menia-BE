@@ -40,9 +40,9 @@ export default class PermissionChecker {
       return false;
     }
 
-    if (!this.hasPlanPermission(permission)) {
-      return false;
-    }
+    // if (!this.hasPlanPermission(permission)) {
+    //   return false;
+    // }
 
     return this.hasRolePermission(permission);
   }

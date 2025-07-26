@@ -284,6 +284,57 @@ export default class TenantUserRepository {
       options,
     );
   }
+
+  static async updateStatus(
+    tenantId,
+    id,
+    status,
+    options: IRepositoryOptions,
+  ) {
+    const user =
+      await MongooseRepository.wrapWithSessionIfExists(
+        User(options.database)
+          .findById(id)
+          .populate('tenants.tenant'),
+        options,
+      );
+
+    const tenantUser = user.tenants.find((userTenant) => {
+      return userTenant.tenant.id === tenantId;
+    });
+
+    if (!tenantUser) {
+      throw new Error403(
+        options.language,
+        'userNotFound',
+      );
+    }
+
+    tenantUser.status = status;
+
+    await User(options.database).updateOne(
+      { _id: id, 'tenants.tenant': tenantId },
+      {
+        $set: {
+          'tenants.$.status': status,
+        },
+      },
+      options,
+    );
+
+    await AuditLogRepository.log(
+      {
+        entityName: 'user',
+        entityId: user.id,
+        action: AuditLogRepository.UPDATE,
+        values: {
+          email: user.email,
+          status,
+        },
+      },
+      options,
+    );
+  }
 }
 
 function selectStatus(oldStatus, newRoles) {

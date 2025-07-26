@@ -28,6 +28,7 @@ const en = {
       invalidPassword: 'The old password is invalid',
     },
     notVerified:'you email not verified',
+    userBlocked: 'Your account has been blocked. Please contact support.',
   },
 
   user: {
