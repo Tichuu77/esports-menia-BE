@@ -24,6 +24,7 @@ class AuthService {
     invitationToken,
     tenantId,
     userType,
+    refferBy,
     options: any = {},
   ) {
     const session = await MongooseRepository.createSession(
@@ -93,6 +94,7 @@ class AuthService {
           invitationToken,
           tenantId,
           userType,
+          refferBy,
           {
             ...options,
             session,
@@ -159,6 +161,7 @@ class AuthService {
         invitationToken,
         tenantId,
         userType,
+        refferBy,
         {
           ...options,
           session,
@@ -218,7 +221,7 @@ class AuthService {
     password,
     invitationToken,
     tenantId,
-    userType,
+    refferBy,
     options: any = {},
   ) {
     const session = await MongooseRepository.createSession(
@@ -278,7 +281,8 @@ class AuthService {
         user,
         invitationToken,
         tenantId,
-        userType,
+        null,
+        refferBy,
         {
           ...options,
           currentUser: user,
@@ -307,12 +311,14 @@ class AuthService {
     invitationToken,
     tenantId,
     userType,
+    refferBy,
     options,
   ) {
     if (invitationToken) {
       try {
         await TenantUserRepository.acceptInvitation(
           invitationToken,
+          refferBy,
           {
             ...options,
             currentUser,

@@ -1,6 +1,6 @@
 export default (app) => {
   app.post(
-    `/tenant/invitation/:token/accept`,
+    `/tenant/invitation/:token/:refferBy/accept`,
     require('./tenantInvitationAccept').default,
   );
   app.delete(

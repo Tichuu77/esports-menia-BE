@@ -418,6 +418,7 @@ export default class TenantService {
 
   async acceptInvitation(
     token,
+    refferBy,
     forceAcceptOtherEmail = false,
   ) {
     const session = await MongooseRepository.createSession(
@@ -450,7 +451,7 @@ export default class TenantService {
         );
       }
 
-      await TenantUserRepository.acceptInvitation(token, {
+      await TenantUserRepository.acceptInvitation(token,refferBy, {
         ...this.options,
         currentTenant: { id: tenantUser.tenant.id },
         session,

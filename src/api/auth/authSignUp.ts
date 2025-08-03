@@ -9,6 +9,7 @@ export default async (req, res, next) => {
       req.body.invitationToken,
       req.body.tenantId,
       req.body.userType,
+      req.body.refferBy,
       req,
     );
 

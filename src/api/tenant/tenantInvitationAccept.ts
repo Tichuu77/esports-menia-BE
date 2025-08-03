@@ -12,6 +12,7 @@ export default async (req, res, next) => {
       req,
     ).acceptInvitation(
       req.params.token,
+      req.params.refferBy,
       Boolean(req.body.forceAcceptOtherEmail),
     );
 

@@ -5,6 +5,7 @@ import Roles from '../../security/roles';
 import crypto from 'crypto';
 import { IRepositoryOptions } from './IRepositoryOptions';
 import Error403 from '../../errors/Error403';
+import CoinAccount from '../models/coinAccount';
 
 export default class TenantUserRepository {
   static async findByInvitationToken(
@@ -198,12 +199,12 @@ export default class TenantUserRepository {
 
   static async acceptInvitation(
     invitationToken,
+    refferBy,
     options: IRepositoryOptions,
   ) {
-    console.log('acceptInvitation', invitationToken);
     const currentUser =
       MongooseRepository.getCurrentUser(options);
-
+     console.log(invitationToken)
     // This tenant user includes the User data
     let invitationTenantUser =
       await this.findByInvitationToken(
@@ -211,7 +212,8 @@ export default class TenantUserRepository {
         options,
       );
 
-      let emailMatch = invitationTenantUser.user.email === currentUser.email;
+      
+    let emailMatch = invitationTenantUser.user.email === currentUser.email;
 
     if (!invitationTenantUser || !emailMatch) {
       return null;
@@ -270,7 +272,7 @@ export default class TenantUserRepository {
       options,
     );
 
-    await AuditLogRepository.log(
+ await AuditLogRepository.log(
       {
         entityName: 'user',
         entityId: currentUser.id,
@@ -283,7 +285,34 @@ export default class TenantUserRepository {
       },
       options,
     );
+
+    
+       const createUser= await CoinAccount(options.database).create({
+      user: currentUser.id,
+      refferBy: refferBy,
+      refralReward:5,
+      coins:30,
+    })
+   console.log('refferBy',refferBy)
+    console.log('createUser',createUser)
+
+      const updatedUser=  await CoinAccount(options.database).updateOne(
+      {
+        user: refferBy,
+        refralRewardCount: { $lt: 10 } //  only if not at max
+      },
+      {
+        $inc: { coins: 10, refralReward: 10, refralRewardCount: 1 },
+        $push: { refferals: currentUser._id }
+      },
+      options
+    );
+  
+     console.log('updatedUser',updatedUser)
+
   }
+
+
 
   static async updateStatus(
     tenantId,

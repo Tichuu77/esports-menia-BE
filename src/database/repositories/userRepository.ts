@@ -9,6 +9,7 @@ import SettingsRepository from './settingsRepository';
 import { isUserInTenant } from '../utils/userTenantUtils';
 import { IRepositoryOptions } from './IRepositoryOptions';
 import lodash from 'lodash';
+import CoinAccount from '../models/coinAccount';
 export default class UserRepository {
   static async create(data, options: IRepositoryOptions) {
     const currentUser =
@@ -883,6 +884,7 @@ export default class UserRepository {
     if (!user) {
       throw new Error404(options.language, 'userNotFound');
     }
+     await MongooseRepository.destroyRelationToOne(id,CoinAccount(options.database),'user',options)
     await User(options.database).deleteOne({ _id: id }, options);
     return user;
     }

@@ -148,9 +148,10 @@ export default class UserCreator {
 
     return Promise.all(
       this.emailsToInvite.map((emailToInvite) => {
+        let currentUser = this.options.currentUser.id
         const link = `${tenantSubdomain.frontendUrl(
           this.options.currentTenant,
-        )}/auth/invitation?token=${emailToInvite.token}`;
+        )}/auth/invitation?token=${emailToInvite.token}&reffreBy=${currentUser}`;
 
         console.log(`Sending invitation email to ${emailToInvite.email} with link: ${link}`);
 

@@ -5,6 +5,7 @@ const models = [
   require('./auditLog').default,
   require('./settings').default,
   require('./user').default,
+  require('./coinaccount').default,
  
 ];
 

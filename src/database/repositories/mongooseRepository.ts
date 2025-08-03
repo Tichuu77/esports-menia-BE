@@ -224,6 +224,7 @@ export default class MongooseRepository {
     targetProperty,
     options: IRepositoryOptions,
   ) {
+    console.log('model',targetModel)
     await targetModel.updateMany(
       { [targetProperty]: recordId },
       { [targetProperty]: null },
