@@ -347,6 +347,7 @@ class AuthService {
           // leave empty to require admin's approval
           roles: [],
         },
+        refferBy,
         options,
       );
     }
@@ -361,7 +362,7 @@ class AuthService {
       await new TenantService({
         ...options,
         currentUser,
-      }).joinDefaultUsingInvitedEmail(options.session);
+      }).joinDefaultUsingInvitedEmail(refferBy,options.session);
 
       // Creates or join default Tenant
       await new TenantService({

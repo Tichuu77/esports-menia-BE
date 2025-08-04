@@ -91,6 +91,7 @@ export default class TenantService {
 
   async joinWithDefaultRolesOrAskApproval(
     { roles, tenantId },
+    refferBy,
     { session },
   ) {
     const tenant = await TenantRepository.findById(
@@ -129,6 +130,7 @@ export default class TenantService {
       if (tenantUser.status === 'invited') {
         return await TenantUserRepository.acceptInvitation(
           tenantUser.invitationToken,
+          refferBy,
           {
             ...this.options,
             session,
@@ -151,7 +153,7 @@ export default class TenantService {
 
   // In case this user has been invited
   // but havent used the invitation token
-  async joinDefaultUsingInvitedEmail(session) {
+  async joinDefaultUsingInvitedEmail(refferBy,session) {
     const tenant = await TenantRepository.findDefault({
       ...this.options,
       session,
@@ -185,6 +187,7 @@ export default class TenantService {
 
     return await TenantUserRepository.acceptInvitation(
       tenantUser.invitationToken,
+      refferBy,
       {
         ...this.options,
         session,
