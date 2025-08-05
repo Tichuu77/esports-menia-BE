@@ -9,6 +9,7 @@ import Error400 from '../../errors/Error400';
 import path from 'path';
 import fs from 'fs';
 import { i18n } from '../../i18n';
+import CoinAccount from '../../database/models/coinAccount';
 
 export default class UserInviter {
   options: IServiceOptions;
@@ -106,6 +107,17 @@ export default class UserInviter {
       );
     }
 
+   const updatedUser= await CoinAccount(this.options.database).updateOne(
+      {user:this.options?.currentUser ,
+        refralRewardCount: { $lt: 10 }
+      },
+      {
+        $push:{refferals:{user:user._id,status:'invite'}},
+        $inc:{refralRewardCount:1}
+      }
+    )
+  
+    console.log('updatedUser in invite',updatedUser)
     const isUserAlreadyInTenant = user.tenants.some(
       (userTenant) =>
         userTenant.tenant.id ===

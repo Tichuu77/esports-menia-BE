@@ -26,8 +26,14 @@ export default (database) => {
       },
       refferals:[
         {
-          type: Schema.Types.ObjectId,
+          user:{type: Schema.Types.ObjectId,
           ref : 'user',
+          },
+          status:{
+            type:String,
+            default:'invite',
+            enum:['invite','accept','reject']
+          }
         }
       ],
       refralReward:{

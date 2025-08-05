@@ -204,7 +204,7 @@ export default class TenantUserRepository {
   ) {
     const currentUser =
       MongooseRepository.getCurrentUser(options);
-     console.log(invitationToken)
+    console.log(invitationToken)
     // This tenant user includes the User data
     let invitationTenantUser =
       await this.findByInvitationToken(
@@ -212,7 +212,7 @@ export default class TenantUserRepository {
         options,
       );
 
-      
+
     let emailMatch = invitationTenantUser.user.email === currentUser.email;
 
     if (!invitationTenantUser || !emailMatch) {
@@ -272,7 +272,7 @@ export default class TenantUserRepository {
       options,
     );
 
- await AuditLogRepository.log(
+    await AuditLogRepository.log(
       {
         entityName: 'user',
         entityId: currentUser.id,
@@ -286,29 +286,35 @@ export default class TenantUserRepository {
       options,
     );
 
-    
-       const createUser= await CoinAccount(options.database).create({
+
+    const createUser = await CoinAccount(options.database).create({
       user: currentUser.id,
       refferBy: refferBy,
-      refralReward:5,
-      coins:30,
+      refralReward: 5,
+      coins: 30,
     })
-   console.log('refferBy',refferBy)
-    console.log('createUser',createUser)
-
-      const updatedUser=  await CoinAccount(options.database).updateOne(
+    console.log('refferBy', refferBy)
+    console.log('createUser', createUser)
+    const updatedUser = await CoinAccount(options.database).updateOne(
       {
         user: refferBy,
-        refralRewardCount: { $lt: 10 } //  only if not at max
+        refralRewardCount: { $lt: 10 },
+        'refferals.user': currentUser.id,
       },
       {
-        $inc: { coins: 10, refralReward: 10, refralRewardCount: 1 },
-        $push: { refferals: currentUser._id }
+        $inc: {
+          coins: 10,
+          refralReward: 10,
+        },
+        $set: {
+          'refferals.$.status': 'accept',
+        },
       },
       options
     );
-  
-     console.log('updatedUser',updatedUser)
+
+
+    console.log('updatedUser in accept', updatedUser)
 
   }
 
