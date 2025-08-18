@@ -458,72 +458,7 @@ export default class UserRepository {
     return { rows, count };
   }
 
-  static async findInvitesAndCountAll(
-  { filter, limit = 0, offset = 0, orderBy = '' },
-  options: IRepositoryOptions,
-) {
-  const currentTenant = MongooseRepository.getCurrentTenant(options);
-  const currentUser = options?.currentUser?._id;
 
-  // Initial criteria for the CoinAccount owner
-  
-
-  // Step 1: Get the main CoinAccount
-  const coinAccount = await MongooseRepository.wrapWithSessionIfExists(
-    CoinAccount(options.database)
-      .findOne({  user: currentUser})
-      .select('refferals refralRewardCount isLimitExced')
-      .populate({
-        path: 'refferals.user',
-        select: 'email fullName',
-      }),
-    options,
-  );
-
-  if (!coinAccount) {
-    return { rows: [], count: 0 };
-  }
-
-  // Step 2: Apply filters on populated refferals array
-  const { status, email } = filter || {};
-  let filteredRefferals = coinAccount.refferals || [];
-
-  filteredRefferals = filteredRefferals.filter((ref: any) => {
-    if (status && ref.status !== status) return false;
-    if (email && (!ref.user || !ref.user.email?.includes(email))) return false;
-    return true;
-  });
-
-  const total = filteredRefferals.length;
-
-  
-
-  // Step 3: Paginate
-const paginated =
-  limit > 0
-    ? filteredRefferals.slice(offset, offset + limit)
-    : filteredRefferals.slice(offset);
-
-  // Step 4: Format response
-  const rows = paginated.map((ref: any) => ({
-    id: ref._id,
-    status: ref.status,
-    user: ref.user
-      ? {
-          id: ref.user._id,
-          email: ref.user.email,
-          fullName: ref.user.fullName,
-        }
-      : null,
-  }));
-
-  return {
-    rows,
-    count: total,
-    refralRewardCount: coinAccount.refralRewardCount,
-    isLimitExced: coinAccount.isLimitExced,
-  };
-}
 
 
   static async findAllAutocomplete(
@@ -770,7 +705,7 @@ const paginated =
   }
 
   static async count(filter, options: IRepositoryOptions) {
-    console.log('run')
+
     return MongooseRepository.wrapWithSessionIfExists(
       User(options.database).countDocuments(filter),
       options,

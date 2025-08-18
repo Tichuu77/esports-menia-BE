@@ -12,6 +12,7 @@ export default class ApiResponseHandler {
   }
 
   static async error(req, res, error) {
+    console.log('run')
     if (
       error &&
       [400, 401, 403, 404].includes(error.code)

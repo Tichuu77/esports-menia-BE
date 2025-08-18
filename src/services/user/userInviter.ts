@@ -117,7 +117,6 @@ export default class UserInviter {
       }
     )
   
-    console.log('updatedUser in invite',updatedUser)
     const isUserAlreadyInTenant = user.tenants.some(
       (userTenant) =>
         userTenant.tenant.id ===
@@ -162,7 +161,7 @@ export default class UserInviter {
           this.options.currentTenant,
         )}/auth/invitation?token=${emailToInvite.token}&reffreBy=${currentUser}`;
 
-        console.log(`Sending invitation email to ${emailToInvite.email} with link: ${link}`);
+     
 
           const subject = 'Invitation to join Esports Menia';
        

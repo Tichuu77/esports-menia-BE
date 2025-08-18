@@ -12,6 +12,8 @@ import { createRateLimiter } from './apiRateLimiter';
 import { languageMiddleware } from '../middlewares/languageMiddleware';
 import authSocial from './auth/authSocial';
 import setupSwaggerUI from './apiDocumentation';
+import { dailyRewardMiddleware } from '../middlewares/dailyRewardMiddleware';
+ 
 
 const app = express();
 
@@ -28,10 +30,16 @@ app.use(languageMiddleware);
 // to set the currentUser to the requests
 app.use(authMiddleware);
 
-console.log('Auth middleware configured');
+app.use(tenantMiddleware);
+
+app.use(dailyRewardMiddleware)
+
 
 // Setup the Documentation
 setupSwaggerUI(app);
+
+ 
+ require('../jobs/index').default
 
 // Default rate limiter
 const defaultRateLimiter = createRateLimiter({
@@ -73,6 +81,7 @@ require('./tenant').default(routes);
 require('./file').default(routes);
 require('./user').default(routes);
 require('./settings').default(routes);
+require('./invite').default(routes);
  
 
 // Loads the Tenant if the :tenantId param is passed

@@ -4,7 +4,6 @@ import Error403 from '../../errors/Error403';
 
 export default async (req, res, next) => {
   try {
-    console.log('Received request to update profile:', req.body);
     if (!req.currentUser || !req.currentUser.id) {
       throw new Error403(req.language);
     }

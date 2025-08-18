@@ -84,7 +84,6 @@ export default (database) => {
     getters: true,
   });
 
-  console.log('model',database)
 
   return database.model('user', UserSchema);
 };

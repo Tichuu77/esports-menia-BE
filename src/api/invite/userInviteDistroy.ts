@@ -1,18 +1,20 @@
+import UserDestroyer from '../../services/user/userDestroyer';
 import PermissionChecker from '../../services/user/permissionChecker';
 import ApiResponseHandler from '../apiResponseHandler';
 import Permissions from '../../security/permissions';
-import UserRepository from '../../database/repositories/userRepository';
+import CoinAccountService from '../../services/coinAccount/user/coinAccountService';
 
 export default async (req, res) => {
   try {
     new PermissionChecker(req).validateHas(
-      Permissions.values.userInvitesRead,
+      Permissions.values.userInvitesDistroy,
     );
 
-    const payload = await UserRepository.findInvitesAndCountAll(
-      req.query,
-      req,
-    );
+    console.log('req.param',req.body.params.ids)
+    let ids =req.body?.params?.ids||[]
+    let result =await CoinAccountService.destroyInvite(ids,req) 
+
+    const payload =  result;
 
     await ApiResponseHandler.success(req, res, payload);
   } catch (error) {

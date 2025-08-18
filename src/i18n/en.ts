@@ -93,126 +93,14 @@ const en = {
   },
 
   entities: {
-    company: {
-      errors: {
-        unique: {},
-      },
-    },
-    year: {
-      errors: {
-        unique: {},
-      },
-    },
-    balanceSheet: {
-      errors: {
-        unique: {},
-      },
-    },
-    group: {
-      errors: {
-        unique: {},
-      },
-    },
-    subGroup: {
-      errors: {
-        unique: {},
-        identifierExists: 'Identifier already exists',
-      },
-    },
-     subPackingType: {
-      errors: {
-        unique: {},
-      },
-    },
-    openingYear: {
-      errors: {
-        unique: {},
-      },
-    },
-    expenseAccount: {
-      errors: {
-        unique: {},
-      },
-    },
-    item: {
-      errors: {
-        unique: {},
-      },
-    },
-    itemQuality: {
-      errors: {
-        unique: {},
-      },
-    },
-    size: {
-      errors: {
-        unique: {},
-      },
-    },
-    packing: {
-      errors: {
-        unique: {},
-      },
-    },
-    individualExpense: {
-      errors: {
-        unique: {},
-      },
-    },
-    expensesForBill: {
-      errors: {
-        unique: {},
-      },
-    },
-    expensesForTransaction: {
-      errors: {
-        unique: {},
-      },
-    },
-    goodsType: {
-      errors: {
-        unique: {},
-      },
-    },
-    goodsArrival: {
-      errors: {
-        unique: {},
-      },
-    },
-    goodsSales: {
-      errors: {
-        unique: {},
-        quntityLessThan:'Quantity should be less than quntity left',
-        qualityQuantityLessThan:'Quality quantity should be less than quality left',
-        subPackingTypeQuantityLessThan:'Sub packing type quantity should be less than sub packing type left',
-        invalidQuality: 'Invalid quality',
-        invalidSubPackingType: 'Invalid sub packing type',
-        buyerLimitExceed: 'Buyer limit exceeded',
-        goodsSalesNotFound:"Goods sales not found ",
-        goodsArrivalNotFound:"Goods arrival not found ",
-        lotNumberMismatch: 'Lot number mismatch',
-      },
-    },
-    subPartyGoodsArrival: {
-      errors: {
-        unique: {},
-      },
-    },
-    masterSelection: {
-      errors: {
-        unique: {},
-      },
-    },
-    voucherEntry: {
-      errors: {
-        unique: {},
-      },
-    },
-    coldStorage: {
-      errors: {
-        unique: {},
-      },
-    },
+      coinAccount:{
+        errors:{
+          notFound:'Coin account not found',
+          userInviteAccepted:'User has accepted your invite and cannot be removed',
+          userForRemoveNotFound:'Invited user not found for remove',
+          
+        }
+      }
   },
 };
 

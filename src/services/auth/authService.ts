@@ -115,7 +115,6 @@ class AuthService {
           ),
         );
 
-        console.log('isEmailVerified', isEmailVerified)
 
         if (!isEmailVerified && EmailSender.isConfigured) {
           await this.sendEmailAddressVerificationEmail(
@@ -244,7 +243,6 @@ class AuthService {
 
       const currentPassword =
         await UserRepository.findPassword(user.id, options);
-        console.log('currentPassword', currentPassword)
 
       if (!currentPassword) {
         throw new Error400(
@@ -515,7 +513,6 @@ class AuthService {
       link = `${tenantSubdomain.frontendUrl(
         tenant,
       )}/auth/password-reset?token=${token}`;
-      console.log('link', link)
     } catch (error) {
       console.error(error);
       throw new Error400(
@@ -537,7 +534,6 @@ class AuthService {
     // replace a placeholder in your template with the link
     html = html.replace('{{RESET_LINK}}', link);
 
-    console.log('html', html)
 
     return new EmailSender(subject, html).sendTo(email);
   }

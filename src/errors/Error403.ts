@@ -5,7 +5,6 @@ export default class Error403 extends Error {
 
   constructor(language?, messageCode?) {
     let message;
-
     if (messageCode && i18nExists(language, messageCode)) {
       message = i18n(language, messageCode);
     }

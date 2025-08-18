@@ -152,8 +152,7 @@ export default class UserCreator {
         const link = `${tenantSubdomain.frontendUrl(
           this.options.currentTenant,
         )}/auth/invitation?token=${emailToInvite.token}&reffreBy=${currentUser}`;
-
-        console.log(`Sending invitation email to ${emailToInvite.email} with link: ${link}`);
+ 
 
           const subject = 'Invitation to join Esports Menia';
        

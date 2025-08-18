@@ -55,6 +55,10 @@ class Permissions {
         id: 'userRead',
         allowedRoles: [roles.owner, roles.user,],
       },
+      userInvitesDistroy:{
+        id: 'userRead',
+        allowedRoles: [roles.owner, roles.user,],
+      },
       userAutocomplete: {
         id: 'userAutocomplete',
         allowedRoles: [roles.admin, roles.owner],

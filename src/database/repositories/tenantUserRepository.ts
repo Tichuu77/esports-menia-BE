@@ -204,7 +204,6 @@ export default class TenantUserRepository {
   ) {
     const currentUser =
       MongooseRepository.getCurrentUser(options);
-    console.log(invitationToken)
     // This tenant user includes the User data
     let invitationTenantUser =
       await this.findByInvitationToken(
@@ -293,8 +292,6 @@ export default class TenantUserRepository {
       refralReward: 5,
       coins: 30,
     })
-    console.log('refferBy', refferBy)
-    console.log('createUser', createUser)
     const updatedUser = await CoinAccount(options.database).updateOne(
       {
         user: refferBy,
@@ -313,8 +310,7 @@ export default class TenantUserRepository {
       options
     );
 
-
-    console.log('updatedUser in accept', updatedUser)
+ 
 
   }
 

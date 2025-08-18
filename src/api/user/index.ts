@@ -5,17 +5,6 @@ export default (app) => {
     `/tenant/:tenantId/user`,
     require('./userCreate').default,
   );
-
-   const inviteRateLimiter = createRateLimiter({
-      max: 6,
-      windowMs: 15 * 60 * 1000,
-      message: 'errors.429',
-    });
-  app.post(
-    `/tenant/:tenantId/invite`,
-    inviteRateLimiter,
-    require('./userInvite').default,
-  );
   app.put(
     `/tenant/:tenantId/user`,
     require('./userEdit').default,
@@ -31,10 +20,6 @@ export default (app) => {
   app.get(
     `/tenant/:tenantId/user`,
     require('./userList').default,
-  );
-    app.get(
-    `/tenant/:tenantId/invites`,
-    require('./userInvitesList').default,
   );
   app.get(
     `/tenant/:tenantId/user/autocomplete`,
